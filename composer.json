@@ -11,6 +11,7 @@
     },
     "require": {
         "slim/psr7": "^1.1",
-        "slim/slim": "4.*"
+        "slim/slim": "4.*",
+        "slim/twig-view": "^3.1"
     }
 }
