@@ -1,8 +1,10 @@
 <?php
 
-use Slim\Factory\AppFactory;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Slim\Factory\AppFactory;
+use Slim\Views\Twig;
+use Slim\Views\TwigMiddleware;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -11,10 +13,9 @@ $app = AppFactory::create();
 $app->addRoutingMiddleware();
 $app->addErrorMiddleware(true, true, true);
 
-$app->get('/', function (ServerRequestInterface $request, ResponseInterface $response) {
-    $response->getBody()->write("hello world");
+$twig = Twig::create(__DIR__ . '/templates');
+$app->add(TwigMiddleware::create($app, $twig));
 
-    return $response;
-});
+$app->get('/', App\Respostas::class);
 
 $app->run();
