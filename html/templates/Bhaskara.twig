@@ -1,36 +1,49 @@
 {% extends "App.twig" %}
 
-{% block title %} Respostas {% endblock %}
+{% block title %} Bhaskara {% endblock %}
 
 {% block body %}
 
-{% if alert %}
-<div class="alert alert-{{ alert.style }}" role="alert">
-  <h4 class="alert-heading">{{ alert.title }}</h4>
-  {{ alert.message }}
+{% if answer %}
+<div class="alert alert-{{ answer.style }}" role="alert">
+  <h4 class="alert-heading">{{ answer.title }}</h4>
+  {% if answer.message %}
+    {{ answer.message }}
+  {% else %}
+    Primeiro calcule o delta:<br>
+    &Delta; = b&sup2; - 4ac = {{ answer.delta }}<br>
+    {% if answer.x %}
+      O delta é zero, porém só existe uma raiz:<br>
+      x = -b / 2a = {{ answer.x }}
+    {% else %}
+      Existem duas raizes:<br>
+      x<sub>1</sub> = (-b + &radic;&Delta;) / 2a = {{ answer.x1 }}<br>
+      x<sub>2</sub> = (-b - &radic;&Delta;) / 2a = {{ answer.x2 }}
+    {% endif %}
+  {% endif %}
 </div>
 {% endif %}
 
-<form action="/cadastro" method="get">
+
+<p class="text-center">
+ax&sup2; + bx + c = 0
+</p>
+
+<form action="/bhaskara" method="get">
 
   <div class="form-group">
-    <label for="name">Nome</label>
-    <input type="text" class="form-control" name="name" id="name" maxlength="127" oninvalid="setCustomValidity('Por favor, insira um noma válido.')" oninput="setCustomValidity('')" required>
+    <label for="a">a</label>
+    <input type="text" class="form-control" name="a" id="a" maxlength="25" oninvalid="setCustomValidity('Por favor, preencha este campo.')" oninput="setCustomValidity('')" value="1" required>
   </div>
 
   <div class="form-group">
-    <label for="email">E-mail</label>
-    <input type="email" class="form-control" name="email" id="email" maxlength="127" oninvalid="setCustomValidity('Por favor, insira um e-mail válido.')" oninput="setCustomValidity('')" required>
+    <label for="b">b</label>
+    <input type="text" class="form-control" name="b" id="b" maxlength="25" oninvalid="setCustomValidity('Por favor, preencha este campo.')" oninput="setCustomValidity('')" value="0" required>
   </div>
 
   <div class="form-group">
-    <label for="phone">Telefone</label>
-    <input type="text" class="form-control" name="phone" id="phone" maxlength="25" oninvalid="setCustomValidity('Por favor, insira um telefone válido.')" oninput="setCustomValidity('')" required>
-  </div>
-
-  <div class="form-group">
-    <label for="age">Idade</label>
-    <input type="number" class="form-control" name="age" id="age" min="0" max="99" oninvalid="setCustomValidity('Por favor, insira uma idade válida.')" oninput="setCustomValidity('')" required>
+    <label for="c">c</label>
+    <input type="text" class="form-control" name="c" id="c" maxlength="25" oninvalid="setCustomValidity('Por favor, preencha este campo.')" oninput="setCustomValidity('')" value="-1" required>
   </div>
 
   <button type="submit" class="btn btn-primary">Enviar</button>
@@ -60,64 +73,19 @@ const setFilter = (element, filter) => {
   });
 }
 
-setFilter(document.getElementById('name'), (value) => {
-  // Um nome só deve conter letras e espaços.
-  const re1 = /^[ A-Za-z]*$/;
-  // Um nome _não_ deve conter dois (ou mais) espaços em seguida.
-  const re2 = /  /;
+['a', 'b', 'c'].forEach((id) => {
+  setFilter(document.getElementById(id), (value) => {
+    const re1 = /^[-0-9,]*$/;
+    const re2 = /,/g;
+    const re3 = /-/g;
 
-  return re1.test(value) && !re2.test(value);
+    const count1 = (value.match(re2) || []).length;
+    const count2 = (value.match(re3) || []).length;
+
+    // `indexOf` retorna `-1` se não encontrar a _string_.
+    const minus = value.indexOf('-') < 1;
+
+    return re1.test(value) && count1 < 2 && count2 < 2 && minus;
+  });
 });
-
-setFilter(document.getElementById('phone'), (value) => {
-  // Um telefone pode conter números, parêntesis, espaços, traços e sinais de
-  // mais.
-  const re1 = /^[ -()+0-9]*$/;
-  // Um telefone _não_ deve conter dois (ou mais) espaços em seguida.
-  const re2 = /  /;
-
-  // Excluindo os parêntesis e sinais, um telefone deve conter no máximo 15
-  // digitos ([referência](https://en.wikipedia.org/wiki/E.164)).
-  if(value.replace(/[^0-9]/g, '').length > 15) {
-    return false;
-  }
-
-  return re1.test(value) && !re2.test(value);
-});
-
-setFilter(document.getElementById('age'), (value) => {
-  // Uma idade contém no máximo dois digitos.
-  const re = /^[0-9]{0,2}$/;
-
-  return re.test(value);
-});
-
-const url = new URL(window.location.href);
-
-const name  = document.getElementById('name');
-const email = document.getElementById('email');
-const phone = document.getElementById('phone');
-const age   = document.getElementById('age');
-
-if(url.searchParams.get('name')) {
-  name.value = url.searchParams.get('name');
-}
-
-if(url.searchParams.get('email')) {
-  email.value = url.searchParams.get('email');
-}
-
-if(url.searchParams.get('phone')) {
-  phone.value = url.searchParams.get('phone');
-
-  const length = phone.value.replace(/[^0-9]/g, '').length;
-
-  if(length > 15 || length < 8) {
-    phone.setCustomValidity('Por favor, insira um telefone válido.');
-  }
-}
-
-if(url.searchParams.get('age')) {
-  age.value = url.searchParams.get('age');
-}
 {% endblock %}
