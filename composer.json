@@ -1,4 +1,6 @@
 {
+    "name": "pedrominicz/lorem",
+    "type": "project",
     "autoload": {
         "psr-4": {
             "App\\": "html/"
@@ -10,8 +12,12 @@
         "sort-packages": true
     },
     "require": {
+        "php": "^7.4",
+        "ext-pdo": "*",
+        "erusev/parsedown": "^1.7",
+        "php-di/php-di": "^6.1",
         "slim/psr7": "^1.1",
-        "slim/slim": "4.*",
+        "slim/slim": "^4.5",
         "slim/twig-view": "^3.1"
     }
 }
